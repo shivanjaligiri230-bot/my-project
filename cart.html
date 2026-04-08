@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Folio & Co. — Cart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-page:     #f6f0e8;
+      --bg-card:     #ffffff;
+      --bg-nav:      #222222;
+      --btn:         #ff6a00;
+      --btn-hover:   #e05a00;
+      --text-main:   #333333;
+      --text-muted:  #888888;
+      --text-light:  #ffffff;
+      --border:      #f0d8c0;
+      --border-dark: #ffb870;
+      --cream:       #f6f0e8;
+      --parchment:   #fdf5ec;
+      --blush:       #f0d8c0;
+      --warm-tan:    #ffb870;
+      --caramel:     #ff6a00;
+      --espresso:    #222222;
+      --dark-roast:  #111111;
+      --sage:        #ffe0c0;
+      --sage-dark:   #ff8c35;
+      --shadow-soft: 0 4px 24px rgba(255,106,0,0.10);
+      --shadow-card: 0 2px 12px rgba(34,34,34,0.08);
+      --radius-sm:   8px;
+      --radius-md:   14px;
+      --radius-lg:   22px;
+      --transition:  all 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Subtle grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ────────────────────────────────────────────
+       PAGE-LOAD ANIMATIONS
+    ──────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes popIn {
+      0%   { opacity: 0; transform: scale(0.85); }
+      70%  { transform: scale(1.04); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(255,106,0,0.35); }
+      70%  { box-shadow: 0 0 0 10px rgba(255,106,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,106,0,0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-5px); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes badgePop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.35); }
+      100% { transform: scale(1); }
+    }
+    @keyframes progressFill {
+      from { width: 0%; }
+      to   { width: 68%; }
+    }
+    @keyframes tagSlide {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ────────────────────────────────────────────
+       NAVBAR
+    ──────────────────────────────────────────── */
+    .navbar {
+      background: linear-gradient(90deg, #e05a00 0%, #ff6a00 50%, #e05a00 100%);
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 24px rgba(255,106,0,0.2);
+      animation: fadeIn 0.5s ease both;
+    }
+
+    /* animated orange line under navbar */
+    .navbar::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #ff6a00, #ffb870, #ff6a00);
+      animation: shimmer 2.5s linear infinite, fadeIn 0.1s 0.5s both;
+      background-size: 400px 100%;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: #222222;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: #fff;
+      flex-shrink: 0;
+      transition: var(--transition);
+      animation: float 3s ease-in-out infinite;
+    }
+    .logo:hover .logo-icon {
+      background: #111;
+      animation: none;
+      transform: rotate(-8deg) scale(1.1);
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem; font-weight: 600;
+      color: #ffffff; letter-spacing: 0.02em;
+    }
+    .logo-text span { color: #222222; }
+
+    .nav-links { list-style: none; display: flex; gap: 0.3rem; align-items: center; }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.9rem; font-weight: 400;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    /* underline slide-in on hover */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 50%;
+      width: 0; height: 2px;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: all 0.25s ease;
+      transform: translateX(-50%);
+    }
+    .nav-links a:hover::after { width: 60%; }
+    .nav-links a:hover { color: #ffffff; background: rgba(0,0,0,0.15); }
+    .nav-links a.active {
+      color: #ffffff; font-weight: 700;
+      background: rgba(0,0,0,0.2);
+    }
+    .nav-links a.active::after { width: 60%; }
+
+    .cart-btn {
+      position: relative;
+      background: #222222;
+      color: #ffffff; border: none;
+      border-radius: 50px;
+      padding: 0.5rem 1.1rem;
+      display: flex; align-items: center; gap: 0.45rem;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer; transition: var(--transition);
+      text-decoration: none;
+      animation: pulse-ring 2.5s ease infinite;
+    }
+    .cart-btn:hover {
+      background: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      animation: none;
+    }
+
+    .cart-badge {
+      background: #ff6a00; color: #fff;
+      border-radius: 50px;
+      font-size: 0.7rem; font-weight: 700;
+      padding: 1px 7px;
+      animation: badgePop 2s ease infinite;
+    }
+
+    /* ────────────────────────────────────────────
+       MAIN
+    ──────────────────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Free shipping progress bar ── */
+    .shipping-banner {
+      background: linear-gradient(135deg, #222 0%, #333 100%);
+      border: 1.5px solid rgba(255,106,0,0.3);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.4rem;
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: fadeUp 0.5s 0.2s both;
+      position: relative;
+      overflow: hidden;
+    }
+    .shipping-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 0% 50%, rgba(255,106,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .shipping-banner .banner-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .shipping-banner .banner-text { flex: 1; }
+    .shipping-banner .banner-text p {
+      font-size: 0.82rem; color: #ffb870; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    .shipping-banner .banner-text span { font-size: 0.75rem; color: #888; }
+    .progress-bar-wrap {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50px; height: 8px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6a00, #ffb870);
+      border-radius: 50px;
+      width: 0%;
+      animation: progressFill 1.2s 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
+      box-shadow: 0 0 8px rgba(255,106,0,0.5);
+    }
+
+    .page-heading {
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.5s 0.3s both;
+    }
+    .page-heading h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem; font-weight: 600;
+      color: #222222; line-height: 1.2;
+      position: relative; display: inline-block;
+    }
+    /* decorative underline on heading */
+    .page-heading h1::after {
+      content: '';
+      position: absolute;
+      bottom: -6px; left: 0;
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, #ff6a00, transparent);
+      border-radius: 2px;
+    }
+    .page-heading p { font-size: 0.9rem; color: #777; margin-top: 0.75rem; }
+    .page-heading p span { font-weight: 700; color: #ff6a00; }
+
+    .breadcrumb {
+      display: flex; align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem; color: var(--text-muted);
+      margin-bottom: 1rem;
+      animation: fadeIn 0.5s 0.1s both;
+    }
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #ff6a00; }
+    .breadcrumb .sep { opacity: 0.5; }
+    .breadcrumb .current { color: #222; font-weight: 700; }
+
+    /* ────────────────────────────────────────────
+       CART LAYOUT
+    ──────────────────────────────────────────── */
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .cart-items { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .cart-header-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 100px 130px 44px;
+      gap: 1rem;
+      padding: 0 1.2rem 0.75rem;
+      border-bottom: 1.5px solid var(--blush);
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted);
+      animation: fadeIn 0.5s 0.4s both;
+    }
+
+    /* ── Product Cards ── */
+    .product-card {
+      background: #fff;
+      border: 1.5px solid var(--blush);
+      border-radius: var(--radius-md);
+      padding: 1.2rem;
+      display: grid;
+      grid-template-columns: 90px 1fr 100px 130px 44px;
+      gap: 1rem;
+      align-items: center;
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+      /* staggered fade-up */
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* shimmer on hover */
+    .product-card::before {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,106,0,0.04), transparent);
+      transition: left 0.5s ease;
+      pointer-events: none;
+    }
+    .product-card:hover::before { left: 150%; }
+
+    .product-card:nth-child(2) { animation-delay: 0.45s; }
+    .product-card:nth-child(3) { animation-delay: 0.55s; }
+    .product-card:nth-child(4) { animation-delay: 0.65s; }
+    .product-card:nth-child(5) { animation-delay: 0.75s; }
+
+    .product-card:hover {
+      border-color: #ff6a00;
+      box-shadow: 0 8px 32px rgba(255,106,0,0.16);
+      transform: translateY(-3px);
+    }
+
+    .book-cover {
+      width: 90px; height: 120px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 4px 6px 18px rgba(61,35,20,0.2);
+      position: relative;
+    }
+    /* glow on hover */
+    .product-card:hover .book-cover {
+      box-shadow: 4px 6px 24px rgba(255,106,0,0.3);
+    }
+    .book-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .product-card:hover .book-cover img { transform: scale(1.08); }
+
+    .book-info { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .book-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 600;
+      color: #222; line-height: 1.3;
+    }
+    .book-author { font-size: 0.82rem; color: #777; font-style: italic; }
+
+    .book-tag {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      background: linear-gradient(135deg, #fff0e6, #ffe4c8);
+      color: #ff6a00;
+      border-radius: 30px;
+      padding: 2px 10px;
+      margin-top: 0.25rem;
+      width: fit-content;
+      border: 1px solid rgba(255,106,0,0.2);
+      animation: tagSlide 0.4s ease both;
+    }
+
+    .book-price {
+      font-size: 1rem; font-weight: 700;
+      color: #ff6a00; text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .product-card:hover .book-price { transform: scale(1.08); }
+
+    /* ── Quantity control ── */
+    .qty-control {
+      display: flex; align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--blush);
+      border-radius: 50px; overflow: hidden;
+      width: fit-content; margin: 0 auto;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .qty-control:hover {
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255,106,0,0.1);
+    }
+
+    .qty-btn {
+      background: #fff0e6; border: none;
+      width: 34px; height: 34px;
+      font-size: 1rem; color: #ff6a00;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+    }
+    .qty-btn:hover { background: #ffd9bb; color: #222; }
+    .qty-btn:active { transform: scale(0.88); }
+
+    .qty-value {
+      width: 36px; text-align: center;
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--text-main); background: #fff;
+      padding: 0; border: none; pointer-events: none;
+    }
+
+    .remove-btn {
+      background: none;
+      border: 1.5px solid var(--blush);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-muted);
+      font-size: 1rem;
+      transition: var(--transition);
+      margin: 0 auto;
+    }
+    .remove-btn:hover {
+      background: #fde8e8; border-color: #e8a0a0;
+      color: #c0534e;
+      transform: scale(1.15) rotate(90deg);
+    }
+
+    .continue-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      color: #ff6a00; text-decoration: none;
+      font-size: 0.87rem; font-weight: 700;
+      letter-spacing: 0.04em;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+      animation: fadeIn 0.5s 0.9s both;
+    }
+    .continue-link:hover { color: #222; gap: 0.7rem; }
+
+    /* ────────────────────────────────────────────
+       CART SUMMARY
+    ──────────────────────────────────────────── */
+    .cart-summary {
+      background: #fff;
+      border: 1.5px solid var(--blush);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      box-shadow: var(--shadow-soft);
+      position: sticky; top: 90px;
+      animation: slideInRight 0.6s 0.5s both;
+      overflow: hidden;
+    }
+    /* corner accent */
+    .cart-summary::before {
+      content: '';
+      position: absolute; top: 0; right: 0;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle at top right, rgba(255,106,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .summary-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 600;
+      color: #222;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1.5px dashed #ffd9bb;
+    }
+
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.6rem 0; font-size: 0.9rem; color: #777;
+      animation: fadeIn 0.4s ease both;
+    }
+    .summary-row:nth-child(2) { animation-delay: 0.6s; }
+    .summary-row:nth-child(3) { animation-delay: 0.65s; }
+    .summary-row:nth-child(4) { animation-delay: 0.7s; }
+    .summary-row:nth-child(5) { animation-delay: 0.75s; }
+
+    .summary-row .label { font-weight: 400; }
+    .summary-row .value { font-weight: 700; color: #333; }
+    .summary-row.shipping .value { color: #cc5500; font-size: 0.82rem; letter-spacing: 0.04em; }
+
+    .summary-divider {
+      border: none; border-top: 1.5px dashed #ffd9bb; margin: 0.8rem 0;
+    }
+
+    .summary-row.total { font-size: 1.1rem; padding: 0.7rem 0 0.3rem; }
+    .summary-row.total .label {
+      font-family: 'Playfair Display', serif; font-weight: 600; color: #222;
+    }
+    .summary-row.total .value {
+      font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #ff6a00;
+      animation: popIn 0.5s 0.9s both;
+    }
+
+    .promo-wrap {
+      margin: 1.4rem 0;
+      display: flex; gap: 0;
+      border: 1.5px solid var(--blush);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .promo-wrap:focus-within {
+      border-color: #ff6a00;
+      box-shadow: 0 0 0 3px rgba(255,106,0,0.1);
+    }
+
+    .promo-input {
+      flex: 1; padding: 0.6rem 0.9rem;
+      border: none; background: #fff8f2;
+      font-family: 'Lato', sans-serif; font-size: 0.85rem;
+      color: #333; outline: none;
+      transition: background 0.2s;
+    }
+    .promo-input:focus { background: #fff; }
+    .promo-input::placeholder { color: #999; }
+
+    .promo-btn {
+      background: linear-gradient(135deg, #ff6a00, #ff8c35);
+      color: #fff; border: none;
+      padding: 0.6rem 1rem;
+      font-family: 'Lato', sans-serif; font-size: 0.78rem;
+      font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; transition: var(--transition);
+    }
+    .promo-btn:hover { background: linear-gradient(135deg, #e05a00, #ff6a00); }
+    .promo-btn:active { transform: scale(0.96); }
+
+    .checkout-btn {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #ff6a00 0%, #ff8c35 50%, #ff6a00 100%);
+      background-size: 200% 100%;
+      color: #fff; border: none;
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer; text-align: center;
+      transition: background-position 0.4s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      margin-top: 1.2rem; text-decoration: none;
+    }
+    .checkout-btn:hover {
+      background-position: right center;
+      box-shadow: 0 10px 32px rgba(255,106,0,0.4);
+      transform: translateY(-3px);
+    }
+    .checkout-btn:active { transform: translateY(0); }
+
+    .secure-badge {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;
+    }
+
+    .payment-icons {
+      display: flex; justify-content: center; gap: 0.5rem;
+      margin-top: 1rem; flex-wrap: wrap;
+    }
+
+    .pay-icon {
+      background: var(--parchment);
+      border: 1px solid var(--blush);
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 0.7rem; font-weight: 700;
+      color: var(--text-muted); letter-spacing: 0.05em;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .pay-icon:hover { border-color: #ff6a00; transform: translateY(-2px); }
+
+    /* ────────────────────────────────────────────
+       RECOMMENDATIONS
+    ──────────────────────────────────────────── */
+    .recommend-section { margin-top: 3.5rem; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 600;
+      color: var(--dark-roast); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.7rem;
+      animation: fadeUp 0.5s 0.8s both;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1.5px;
+      background: linear-gradient(90deg, var(--blush), transparent);
+      border-radius: 2px;
+    }
+
+    .recommend-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+    }
+
+    .recommend-card {
+      background: #fff;
+      border: 1.5px solid var(--blush);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease, border-color 0.3s ease;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .recommend-card:nth-child(1) { animation-delay: 0.9s; }
+    .recommend-card:nth-child(2) { animation-delay: 1.0s; }
+    .recommend-card:nth-child(3) { animation-delay: 1.1s; }
+    .recommend-card:nth-child(4) { animation-delay: 1.2s; }
+
+    .recommend-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 36px rgba(107,66,38,0.16);
+      border-color: var(--warm-tan);
+    }
+
+    .rec-img { height: 160px; overflow: hidden; position: relative; }
+    .rec-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.45s ease;
+    }
+    .recommend-card:hover .rec-img img { transform: scale(1.08); }
+
+    /* overlay on hover */
+    .rec-img::after {
+      content: '+ Add';
+      position: absolute; inset: 0;
+      background: rgba(255,106,0,0.75);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .recommend-card:hover .rec-img::after { opacity: 1; }
+
+    .rec-info { padding: 0.9rem 1rem 1rem; }
+    .rec-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem; font-weight: 600;
+      color: var(--dark-roast); line-height: 1.3; margin-bottom: 0.25rem;
+    }
+    .rec-author { font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-bottom: 0.6rem; }
+    .rec-price { font-size: 0.9rem; font-weight: 700; color: var(--espresso); }
+
+    .rec-add-btn {
+      display: block; width: 100%; text-align: center;
+      background: var(--parchment); color: var(--espresso);
+      border: 1.5px solid var(--blush);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      cursor: pointer; margin-top: 0.7rem;
+      transition: var(--transition);
+    }
+    .rec-add-btn:hover {
+      background: linear-gradient(135deg, #ff6a00, #ff8c35);
+      color: #fff; border-color: #ff6a00;
+      transform: translateY(-1px);
+    }
+    .rec-add-btn:active { transform: scale(0.97); }
+
+    /* ────────────────────────────────────────────
+       FOOTER
+    ──────────────────────────────────────────── */
+    footer {
+      background: linear-gradient(90deg, #1a1a1a, #2a2a2a);
+      color: #ffb870;
+      padding: 2rem;
+      text-align: center; margin-top: auto;
+      border-top: 1.5px solid rgba(255,106,0,0.2);
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+    }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--cream); }
+    .footer-logo span { color: var(--caramel); }
+    .footer-links { display: flex; gap: 1.5rem; list-style: none; }
+    .footer-links a {
+      color: var(--warm-tan); text-decoration: none;
+      font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--cream); }
+    .footer-copy { font-size: 0.78rem; opacity: 0.6; letter-spacing: 0.04em; }
+
+    /* ────────────────────────────────────────────
+       QUANTITY COUNTER ANIMATION
+    ──────────────────────────────────────────── */
+    .qty-value.bump {
+      animation: popIn 0.3s ease;
+    }
+
+    /* ────────────────────────────────────────────
+       TOAST NOTIFICATION
+    ──────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: #222; color: #fff;
+      border-left: 4px solid #ff6a00;
+      border-radius: var(--radius-sm);
+      padding: 0.8rem 1.4rem;
+      font-size: 0.85rem; font-weight: 700;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      z-index: 999;
+      transform: translateX(120%);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .toast.show { transform: translateX(0); }
+
+    /* ────────────────────────────────────────────
+       RESPONSIVE
+    ──────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .cart-layout { grid-template-columns: 1fr 300px; }
+      .recommend-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .nav-inner { padding: 0 1rem; }
+      .logo-text { font-size: 1.15rem; }
+      .nav-links { gap: 0; }
+      .nav-links a { padding: 0.4rem 0.6rem; font-size: 0.78rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      .page-heading h1 { font-size: 1.7rem; }
+      .cart-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+      .cart-summary { position: static; }
+      .cart-header-row { display: none; }
+      .product-card {
+        grid-template-columns: 72px 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 0.6rem 1rem; padding: 1rem;
+      }
+      .book-cover { width: 72px; height: 96px; grid-row: 1 / 3; }
+      .book-info { grid-column: 2; grid-row: 1; }
+      .book-price { grid-column: 2; grid-row: 2; text-align: left; font-size: 0.95rem; }
+      .qty-control { grid-column: 1; grid-row: 3; margin: 0; }
+      .remove-btn { grid-column: 2; grid-row: 3; justify-self: end; margin: 0; }
+      .recommend-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+      .shipping-banner { flex-wrap: wrap; }
+    }
+
+    @media (max-width: 420px) {
+      .nav-links li:nth-child(1),
+      .nav-links li:nth-child(4) { display: none; }
+      .recommend-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ────────────────────────────────────────────
+     NAVBAR
+──────────────────────────────────────────── -->
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="home.html" class="logo">
+      <div class="logo-icon">📖</div>
+          </a>
+
+    <ul class="nav-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="all books.html">Books</a></li>
+ <li><a href="about us.html">About</a></li>
+      <li><a href="cart.html" class="active">Cart</a></li>
+  <li><a href="login.html">Login</a></li>
+     
+      <li><a href="contact us.html">Contact</a></li>
+      <li><a href="wishlist.html">Wishlist</a></li>
+      <li><a href="my orders.html">Orders</a></li>
+    
+    </ul>
+
+    <a href="#" class="cart-btn" aria-label="Shopping Cart with 4 items">
+      🛒 Cart <span class="cart-badge" id="cartBadge">4</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ────────────────────────────────────────────
+     MAIN
+──────────────────────────────────────────── -->
+<main>
+
+  <!-- Free Shipping Progress Bar -->
+  <div class="shipping-banner">
+    <span class="banner-icon">🚚</span>
+    <div class="banner-text">
+      <p>You're $26.80 away from free shipping!</p>
+      <span>Orders over $100 qualify for free delivery</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="#">Home</a>
+    <span class="sep">›</span>
+    <a href="#">Shop</a>
+    <span class="sep">›</span>
+    <span class="current">Your Cart</span>
+  </nav>
+
+  <!-- Page heading -->
+  <div class="page-heading">
+    <h1>Your Cart</h1>
+    <p>You have <span id="itemCount">4 items</span> in your reading basket.</p>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="cart-layout">
+
+    <!-- LEFT: Cart Items -->
+    <section class="cart-items" aria-label="Cart items">
+
+      <div class="cart-header-row" aria-hidden="true">
+        <span>Book</span>
+        <span>Details</span>
+        <span style="text-align:center">Price</span>
+        <span style="text-align:center">Quantity</span>
+        <span></span>
+      </div>
+
+      <!-- Card 1 -->
+      <article class="product-card" data-price="14.99">
+        <div class="book-cover">
+          <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200&h=260&fit=crop" alt="The Midnight Library" />
+        </div>
+        <div class="book-info">
+          <span class="book-tag">Fiction</span>
+          <h2 class="book-title">The Midnight Library</h2>
+          <p class="book-author">Matt Haig</p>
+        </div>
+        <div class="book-price">$14.99</div>
+        <div class="qty-control" role="group" aria-label="Quantity">
+          <button class="qty-btn" onclick="changeQty(this,-1)" aria-label="Decrease">−</button>
+          <span class="qty-value">2</span>
+          <button class="qty-btn" onclick="changeQty(this,1)" aria-label="Increase">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeCard(this)" aria-label="Remove">✕</button>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="product-card" data-price="16.49">
+        <div class="book-cover">
+          <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200&h=260&fit=crop" alt="Atomic Habits" />
+        </div>
+        <div class="book-info">
+          <span class="book-tag">Self-Help</span>
+          <h2 class="book-title">Atomic Habits</h2>
+          <p class="book-author">James Clear</p>
+        </div>
+        <div class="book-price">$16.49</div>
+        <div class="qty-control" role="group" aria-label="Quantity">
+          <button class="qty-btn" onclick="changeQty(this,-1)" aria-label="Decrease">−</button>
+          <span class="qty-value">1</span>
+          <button class="qty-btn" onclick="changeQty(this,1)" aria-label="Increase">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeCard(this)" aria-label="Remove">✕</button>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="product-card" data-price="18.00">
+        <div class="book-cover">
+          <img src="https://images.unsplash.com/photo-1465929639680-64ee080eb3ed?w=200&h=260&fit=crop" alt="Sapiens" />
+        </div>
+        <div class="book-info">
+          <span class="book-tag">History</span>
+          <h2 class="book-title">Sapiens</h2>
+          <p class="book-author">Yuval Noah Harari</p>
+        </div>
+        <div class="book-price">$18.00</div>
+        <div class="qty-control" role="group" aria-label="Quantity">
+          <button class="qty-btn" onclick="changeQty(this,-1)" aria-label="Decrease">−</button>
+          <span class="qty-value">1</span>
+          <button class="qty-btn" onclick="changeQty(this,1)" aria-label="Increase">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeCard(this)" aria-label="Remove">✕</button>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="product-card" data-price="12.99">
+        <div class="book-cover">
+          <img src="https://images.unsplash.com/photo-1495640388908-05fa85288e61?w=200&h=260&fit=crop" alt="The Alchemist" />
+        </div>
+        <div class="book-info">
+          <span class="book-tag">Classic</span>
+          <h2 class="book-title">The Alchemist</h2>
+          <p class="book-author">Paulo Coelho</p>
+        </div>
+        <div class="book-price">$12.99</div>
+        <div class="qty-control" role="group" aria-label="Quantity">
+          <button class="qty-btn" onclick="changeQty(this,-1)" aria-label="Decrease">−</button>
+          <span class="qty-value">1</span>
+          <button class="qty-btn" onclick="changeQty(this,1)" aria-label="Increase">+</button>
+        </div>
+        <button class="remove-btn" onclick="removeCard(this)" aria-label="Remove">✕</button>
+      </article>
+
+      <a href="all books.html" class="continue-link">← Continue Shopping</a>
+
+    </section>
+
+    <!-- RIGHT: Summary -->
+    <aside class="cart-summary" aria-label="Order summary">
+      <h2 class="summary-title">Order Summary</h2>
+
+      <div class="summary-row">
+        <span class="label">Subtotal (<span id="totalItems">5</span> items)</span>
+        <span class="value" id="subtotal">$77.46</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Discount (10%)</span>
+        <span class="value" style="color: var(--sage-dark);" id="discount">− $7.75</span>
+      </div>
+      <div class="summary-row shipping">
+        <span class="label">Shipping</span>
+        <span class="value">FREE ✦</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Estimated Tax</span>
+        <span class="value">$3.49</span>
+      </div>
+
+      <hr class="summary-divider" />
+
+      <div class="summary-row total">
+        <span class="label">Total</span>
+        <span class="value" id="totalPrice">$73.20</span>
+      </div>
+
+      <div class="promo-wrap" role="group" aria-label="Promo code">
+        <input type="text" class="promo-input" placeholder="Enter promo code…" id="promoInput" aria-label="Promo code" />
+        <button class="promo-btn" type="button" onclick="applyPromo()">Apply</button>
+      </div>
+
+      <a href="#" class="checkout-btn" role="button">Proceed to Checkout →</a>
+
+      <p class="secure-badge">🔒 Secure &amp; encrypted checkout</p>
+
+      <div class="payment-icons" aria-label="Accepted payment methods">
+        <span class="pay-icon">Visa</span>
+        <span class="pay-icon">Mastercard</span>
+        <span class="pay-icon">UPI</span>
+        <span class="pay-icon">PayPal</span>
+      </div>
+    </aside>
+
+  </div><!-- end .cart-layout -->
+
+  <!-- Recommendations -->
+  <section class="recommend-section">
+    <h2 class="section-title">You Might Also Love</h2>
+    <div class="recommend-grid">
+
+      <div class="recommend-card">
+        <div class="rec-img">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=200&fit=crop" alt="Book" />
+        </div>
+        <div class="rec-info">
+          <p class="rec-title">The Psychology of Money</p>
+          <p class="rec-author">Morgan Housel</p>
+          <p class="rec-price">$13.99</p>
+          <button class="rec-add-btn" onclick="addToCart('The Psychology of Money')">+ Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="recommend-card">
+        <div class="rec-img">
+          <img src="https://images.unsplash.com/photo-1474932430478-367dbb6832c1?w=300&h=200&fit=crop" alt="Book" />
+        </div>
+        <div class="rec-info">
+          <p class="rec-title">Educated</p>
+          <p class="rec-author">Tara Westover</p>
+          <p class="rec-price">$15.50</p>
+          <button class="rec-add-btn" onclick="addToCart('Educated')">+ Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="recommend-card">
+        <div class="rec-img">
+          <img src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=300&h=200&fit=crop" alt="Book" />
+        </div>
+        <div class="rec-info">
+          <p class="rec-title">Think Again</p>
+          <p class="rec-author">Adam Grant</p>
+          <p class="rec-price">$14.25</p>
+          <button class="rec-add-btn" onclick="addToCart('Think Again')">+ Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="recommend-card">
+        <div class="rec-img">
+          <img src="https://images.unsplash.com/photo-1488998527040-85054a85150e?w=300&h=200&fit=crop" alt="Book" />
+        </div>
+        <div class="rec-info">
+          <p class="rec-title">The Subtle Art</p>
+          <p class="rec-author">Mark Manson</p>
+          <p class="rec-price">$11.99</p>
+          <button class="rec-add-btn" onclick="addToCart('The Subtle Art')">+ Add to Cart</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <p class="footer-logo">Folio <span>&</span> Co.</p>
+    <ul class="footer-links">
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="#">Support</a></li>
+      <li><a href="#">Returns</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 Folio & Co. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  /* ── Toast Helper ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* ── Qty change ── */
+  function changeQty(btn, delta) {
+    const ctrl = btn.closest('.qty-control');
+    const valEl = ctrl.querySelector('.qty-value');
+    let val = parseInt(valEl.textContent) + delta;
+    if (val < 1) val = 1;
+    valEl.textContent = val;
+    valEl.classList.remove('bump');
+    void valEl.offsetWidth; // reflow
+    valEl.classList.add('bump');
+    updateSummary();
+  }
+
+  /* ── Remove card with slide-out ── */
+  function removeCard(btn) {
+    const card = btn.closest('.product-card');
+    card.style.transition = 'opacity 0.35s ease, transform 0.35s ease, max-height 0.4s 0.25s ease, margin 0.4s 0.25s ease, padding 0.4s 0.25s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(40px)';
+    card.style.maxHeight = card.offsetHeight + 'px';
+    setTimeout(() => {
+      card.style.maxHeight = '0';
+      card.style.margin = '0';
+      card.style.padding = '0';
+      card.style.border = 'none';
+    }, 300);
+    setTimeout(() => {
+      card.remove();
+      updateSummary();
+      showToast('📚 Book removed from cart');
+    }, 700);
+  }
+
+  /* ── Recalculate summary ── */
+  function updateSummary() {
+    const cards = document.querySelectorAll('.product-card');
+    let subtotal = 0; let totalQty = 0;
+    cards.forEach(card => {
+      const price = parseFloat(card.dataset.price);
+      const qty = parseInt(card.querySelector('.qty-value').textContent);
+      subtotal += price * qty;
+      totalQty += qty;
+    });
+    const discount = subtotal * 0.1;
+    const tax = 3.49;
+    const total = subtotal - discount + tax;
+
+    document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+    document.getElementById('discount').textContent = '− $' + discount.toFixed(2);
+    document.getElementById('totalPrice').textContent = '$' + total.toFixed(2);
+    document.getElementById('totalItems').textContent = totalQty;
+    document.getElementById('itemCount').textContent = cards.length + ' item' + (cards.length !== 1 ? 's' : '');
+    document.getElementById('cartBadge').textContent = cards.length;
+  }
+
+  /* ── Promo code ── */
+  function applyPromo() {
+    const val = document.getElementById('promoInput').value.trim().toUpperCase();
+    if (val === 'FOLIO10') {
+      showToast('🎉 Promo code applied! Extra 10% off');
+    } else if (val === '') {
+      showToast('⚠️ Please enter a promo code');
+    } else {
+      showToast('❌ Invalid promo code');
+    }
+  }
+
+  /* ── Add recommended book ── */
+  function addToCart(title) {
+    document.getElementById('cartBadge').textContent =
+      parseInt(document.getElementById('cartBadge').textContent) + 1;
+    showToast('🛒 ' + title + ' added to cart!');
+  }
+
+  /* ── qty-value bump animation cleanup ── */
+  document.addEventListener('animationend', e => {
+    if (e.target.classList.contains('qty-value')) {
+      e.target.classList.remove('bump');
+    }
+  });
+</script>
+
+</body>
+</html>

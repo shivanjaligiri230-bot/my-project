@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Us – BookStore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #efd8c9;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Particles ── */
+        .particles {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .particle {
+            position: absolute; opacity: 0.1;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10%  { opacity: 0.1; }
+            90%  { opacity: 0.1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: #ff6a00;
+            padding: 14px 20px;
+            text-align: center;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 20px rgba(255,106,0,0.4);
+            animation: slideDown 0.6s ease both;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+        .navbar a {
+            color: white; margin: 0 12px;
+            text-decoration: none; font-size: 14px;
+            font-weight: 700; letter-spacing: 0.4px;
+            position: relative; transition: color 0.25s;
+        }
+        .navbar a::after {
+            content: ''; position: absolute;
+            bottom: -4px; left: 0; width: 0; height: 2px;
+            background: yellow; transition: width 0.3s ease;
+        }
+        .navbar a:hover { color: yellow; }
+        .navbar a:hover::after { width: 100%; }
+
+        /* ── Hero ── */
+        .page-hero {
+            position: relative; z-index: 1;
+            text-align: center;
+            padding: 52px 20px 22px;
+            animation: riseUp 0.8s 0.2s ease both;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: #ff6a00; color: white;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            padding: 5px 18px; border-radius: 30px;
+            margin-bottom: 14px;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(255,106,0,0.5); }
+            50%      { box-shadow: 0 0 0 10px rgba(255,106,0,0); }
+        }
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: #2a1a0e;
+        }
+        .page-hero h1 span { color: #ff6a00; }
+        .page-hero p { color: #999; font-size: 14px; margin-top: 8px; letter-spacing: 0.4px; }
+
+        /* ── Main card ── */
+        .contact-box {
+            position: relative; z-index: 1;
+            width: min(780px, 90%);
+            margin: 0 auto 20px;
+            background: white;
+            border-radius: 24px;
+            padding: 44px 44px 36px;
+            box-shadow: 0 20px 60px rgba(180,100,40,0.15);
+            text-align: center;
+            animation: riseUp 0.9s 0.3s ease both;
+        }
+        .contact-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ff6a00, transparent);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .section-icon { font-size: 44px; display: block; margin-bottom: 6px; animation: bounce 2.5s ease-in-out infinite; }
+        @keyframes bounce {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-9px); }
+        }
+        .contact-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem; color: #2a1a0e;
+            margin-bottom: 8px;
+        }
+        .contact-box .sub {
+            font-size: 13px; color: #bbb;
+            margin-bottom: 32px; letter-spacing: 0.3px;
+        }
+
+        /* ── Team grid ── */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            text-align: left;
+        }
+
+        /* ── Member card ── */
+        .member {
+            background: #fff7f2;
+            border: 1.8px solid #f0ddd0;
+            border-radius: 18px;
+            padding: 22px 22px 18px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+            opacity: 0;
+            animation: cardIn 0.5s ease forwards;
+        }
+        .member:nth-child(1) { animation-delay: 0.5s; }
+        .member:nth-child(2) { animation-delay: 0.65s; }
+        .member:nth-child(3) { animation-delay: 0.80s; }
+        .member:nth-child(4) { animation-delay: 0.95s; }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .member:hover {
+            transform: translateY(-7px) scale(1.02);
+            box-shadow: 0 14px 36px rgba(255,106,0,0.18);
+            border-color: #ff6a00;
+        }
+        /* Decorative circle */
+        .member::after {
+            content: '';
+            position: absolute; top: -20px; right: -20px;
+            width: 70px; height: 70px;
+            background: radial-gradient(circle, rgba(255,106,0,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #ff6a00, #ff8c38);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 14px rgba(255,106,0,0.35);
+            flex-shrink: 0;
+        }
+        .member-header {
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 14px;
+        }
+        .member-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; color: #2a1a0e;
+            font-weight: 700;
+        }
+        .member-role {
+            font-size: 11px; color: #ff6a00;
+            font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Contact rows */
+        .contact-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 8px; font-size: 13px; color: #666;
+        }
+        .contact-row:last-child { margin-bottom: 0; }
+        .contact-row .ci {
+            width: 28px; height: 28px;
+            background: rgba(255,106,0,0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #ff6a00; font-size: 12px; flex-shrink: 0;
+        }
+        .contact-row a {
+            color: #666; text-decoration: none;
+            transition: color 0.2s;
+        }
+        .contact-row a:hover { color: #ff6a00; }
+
+        /* ── Divider ── */
+        .divider {
+            width: 60px; height: 3px; background: #ff6a00;
+            margin: 0 auto 28px; border-radius: 2px;
+            position: relative;
+        }
+        .divider::before, .divider::after {
+            content: ''; position: absolute;
+            top: 50%; transform: translateY(-50%);
+            width: 8px; height: 8px;
+            background: #ff6a00; border-radius: 50%;
+        }
+        .divider::before { left: -14px; }
+        .divider::after  { right: -14px; }
+
+        /* ── Quick contact strip ── */
+        .quick-strip {
+            position: relative; z-index: 1;
+            width: min(780px, 90%);
+            margin: 0 auto 60px;
+            display: flex; gap: 16px; flex-wrap: wrap;
+            animation: riseUp 0.9s 1.1s ease both;
+            opacity: 0;
+        }
+        .quick-strip.visible { opacity: 1; }
+        .quick-card {
+            flex: 1; min-width: 180px;
+            background: #ff6a00;
+            color: white; border-radius: 18px;
+            padding: 22px 18px; text-align: center;
+            box-shadow: 0 8px 24px rgba(255,106,0,0.35);
+            transition: transform 0.3s;
+        }
+        .quick-card:hover { transform: scale(1.05); }
+        .quick-card i { font-size: 24px; margin-bottom: 8px; display: block; }
+        .quick-card p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        .quick-card strong { font-size: 15px; font-weight: 700; }
+
+        /* ── Footer ── */
+        footer {
+            position: relative; z-index: 1;
+            background: #2a1a0e; color: white;
+            text-align: center; padding: 24px;
+            font-size: 13px;
+        }
+        footer span { color: #ff6a00; }
+
+        @keyframes riseUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media(max-width: 560px) {
+            .team-grid { grid-template-columns: 1fr; }
+            .contact-box { padding: 32px 20px; }
+            .quick-strip { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <a href="home.html">Home</a>
+    <a href="all books.html">All Books</a>
+    <a href="about us.html">About</a>
+ <a href="cart.html">Cart</a>
+<a href="login.html">Login</a>
+    <a href="contact us.html">Contact</a>
+    
+    <a href="my orders.html">Orders</a>
+    <a href="wishlist.html">Wishlist</a>
+   
+</div>
+
+<!-- Hero -->
+<div class="page-hero">
+    <div class="hero-badge">👥 Meet the Team</div>
+    <h1>Contact <span>Our Team</span></h1>
+    <p>We'd love to hear from you — reach out to any of our team members</p>
+</div>
+
+<!-- Main Card -->
+<div class="contact-box">
+    <span class="section-icon">💬</span>
+    <h2>Get In Touch</h2>
+    <div class="divider"></div>
+    <p class="sub">Our friendly team is always happy to help you</p>
+
+    <div class="team-grid">
+
+        <div class="member">
+            <div class="member-header">
+                <div class="avatar">👩</div>
+                <div>
+                    <div class="member-name">Sneha Hande</div>
+                    <div class="member-role">Team Member</div>
+                </div>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-envelope"></i></span>
+                <a href="mailto:snehahande9921@gmail.com">snehahande9921@gmail.com</a>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-phone"></i></span>
+                <a href="tel:9370086995">+91 93700 86995</a>
+            </div>
+        </div>
+
+        <div class="member">
+            <div class="member-header">
+                <div class="avatar">👩</div>
+                <div>
+                    <div class="member-name">Shivanjali Giri</div>
+                    <div class="member-role">Team Member</div>
+                </div>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-envelope"></i></span>
+                <a href="mailto:girishivanjali230@gmail.com">girishivanjali230@gmail.com</a>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-phone"></i></span>
+                <a href="tel:8329103171">+91 83291 03171</a>
+            </div>
+        </div>
+
+        <div class="member">
+            <div class="member-header">
+                <div class="avatar">👩</div>
+                <div>
+                    <div class="member-name">Muskan Hadoltikar</div>
+                    <div class="member-role">Team Member</div>
+                </div>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-envelope"></i></span>
+                <a href="mailto:muskanih000@gmail.com">muskanih000@gmail.com</a>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-phone"></i></span>
+                <a href="tel:9529513335">+91 95295 13335</a>
+            </div>
+        </div>
+
+        <div class="member">
+            <div class="member-header">
+                <div class="avatar">👩</div>
+                <div>
+                    <div class="member-name">Nikita Babar</div>
+                    <div class="member-role">Team Member</div>
+                </div>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-envelope"></i></span>
+                <a href="mailto:nikitababar754@gmail.com">nikitababar754@gmail.com</a>
+            </div>
+            <div class="contact-row">
+                <span class="ci"><i class="fa fa-phone"></i></span>
+                <a href="tel:7385595052">+91 73855 95052</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Quick Contact Strip -->
+<div class="quick-strip" id="quickStrip">
+    <div class="quick-card">
+        <i class="fa fa-envelope"></i>
+        <strong>Email Us</strong>
+        <p>We reply within 24 hours</p>
+    </div>
+    <div class="quick-card">
+        <i class="fa fa-phone"></i>
+        <strong>Call Us</strong>
+        <p>Mon – Sat, 9am – 6pm</p>
+    </div>
+    <div class="quick-card">
+        <i class="fa fa-location-dot"></i>
+        <strong>Visit Us</strong>
+        <p>Sangli, Maharashtra</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>📚 <span>BookStore</span> &copy; 2025 — Made with ❤️ for book lovers</p>
+</footer>
+
+<script>
+    /* ── Particles ── */
+    const emojis = ['📚','📖','✉️','📞','💬','📝','🔖','⭐'];
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        el.textContent = emojis[i % emojis.length];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.fontSize = (13 + Math.random() * 15) + 'px';
+        el.style.animationDuration = (12 + Math.random() * 18) + 's';
+        el.style.animationDelay = (Math.random() * 22) + 's';
+        pc.appendChild(el);
+    }
+
+    /* ── Scroll reveal for quick strip ── */
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.style.opacity = '1';
+                e.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.2 });
+    const strip = document.getElementById('quickStrip');
+    strip.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    strip.style.transform = 'translateY(30px)';
+    observer.observe(strip);
+</script>
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BookStore – All Books</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Lato', sans-serif;
+    background: #efd8c9;
+    overflow-x: hidden;
+}
+
+/* ── Particles ── */
+.particles {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0; overflow: hidden;
+}
+.particle {
+    position: absolute; opacity: 0.1;
+    animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.1; }
+    90%  { opacity: 0.1; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+/* ── Header ── */
+header {
+    background: white;
+    padding: 14px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0ddd0;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 16px rgba(180,100,40,0.1);
+    animation: slideDown 0.6s ease both;
+}
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 900;
+    color: #ff6a00;
+    letter-spacing: -0.5px;
+}
+.logo span { color: #2a1a0e; }
+
+nav a {
+    text-decoration: none; color: #333;
+    margin: 0 11px; font-size: 14px; font-weight: 700;
+    position: relative; transition: color 0.25s;
+    letter-spacing: 0.3px;
+}
+nav a::after {
+    content: ''; position: absolute;
+    bottom: -3px; left: 0; width: 0; height: 2px;
+    background: #ff6a00; transition: width 0.3s ease;
+}
+nav a:hover { color: #ff6a00; }
+nav a:hover::after { width: 100%; }
+
+.search-wrap { position: relative; }
+.search-wrap input {
+    padding: 9px 16px 9px 36px;
+    width: 220px;
+    border: 1.8px solid #e8d5c8;
+    border-radius: 30px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+    background: #fff7f2;
+    outline: none;
+    transition: border-color 0.3s, width 0.3s, box-shadow 0.3s;
+}
+.search-wrap input:focus {
+    border-color: #ff6a00;
+    box-shadow: 0 0 0 3px rgba(255,106,0,0.12);
+    width: 260px;
+}
+.search-wrap::before {
+    content: '🔍';
+    position: absolute; left: 11px; top: 50%;
+    transform: translateY(-50%); font-size: 14px;
+    pointer-events: none;
+}
+
+/* ── Hero Banner ── */
+.hero {
+    position: relative; z-index: 1;
+    background: linear-gradient(135deg, #ff6a00 0%, #ff8c38 50%, #ffb07c 100%);
+    height: 300px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: white; text-align: center;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease both;
+}
+.hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("banner.jpg") center/cover no-repeat;
+    opacity: 0.2;
+}
+.hero-content { position: relative; z-index: 1; }
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 900;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    animation: riseUp 0.9s 0.2s ease both;
+}
+.hero p {
+    font-size: 15px; margin-top: 10px; opacity: 0.9;
+    letter-spacing: 1px;
+    animation: riseUp 0.9s 0.4s ease both;
+}
+.hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.22);
+    border: 1.5px solid rgba(255,255,255,0.5);
+    border-radius: 30px; padding: 5px 18px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 14px;
+    animation: riseUp 0.9s 0.1s ease both, pulse 3s 1s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+    50%      { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+}
+
+/* ── Category Pills ── */
+.cat-strip {
+    position: relative; z-index: 1;
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center;
+    padding: 28px 20px 10px;
+    animation: riseUp 0.9s 0.5s ease both;
+}
+.cat-pill {
+    background: white;
+    border: 1.8px solid #f0ddd0;
+    border-radius: 30px;
+    padding: 8px 20px;
+    font-size: 13px; font-weight: 700;
+    color: #555; cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 2px 8px rgba(180,100,40,0.08);
+}
+.cat-pill:hover, .cat-pill.active {
+    background: #ff6a00; color: white;
+    border-color: #ff6a00;
+    box-shadow: 0 4px 14px rgba(255,106,0,0.35);
+    transform: translateY(-2px);
+}
+
+/* ── Section heading ── */
+.section-head {
+    position: relative; z-index: 1;
+    text-align: center; padding: 30px 20px 10px;
+    animation: riseUp 0.9s 0.4s ease both;
+}
+.section-head h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; color: #2a1a0e;
+}
+.section-head h2 span { color: #ff6a00; }
+.divider {
+    width: 60px; height: 3px; background: #ff6a00;
+    margin: 10px auto 0; border-radius: 2px;
+    position: relative;
+}
+.divider::before, .divider::after {
+    content: ''; position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px;
+    background: #ff6a00; border-radius: 50%;
+}
+.divider::before { left: -14px; }
+.divider::after  { right: -14px; }
+
+/* ── Products Grid ── */
+.container {
+    position: relative; z-index: 1;
+    width: 92%; margin: auto; padding: 30px 0 60px;
+}
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 24px;
+}
+
+/* ── Product Card ── */
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 0 0 16px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(180,100,40,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    opacity: 0;
+    animation: cardIn 0.5s ease forwards;
+    position: relative;
+}
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(255,106,0,0.2);
+}
+
+/* staggered card entrance */
+.card:nth-child(1)  { animation-delay: 0.05s; }
+.card:nth-child(2)  { animation-delay: 0.10s; }
+.card:nth-child(3)  { animation-delay: 0.15s; }
+.card:nth-child(4)  { animation-delay: 0.20s; }
+.card:nth-child(5)  { animation-delay: 0.25s; }
+.card:nth-child(6)  { animation-delay: 0.30s; }
+.card:nth-child(7)  { animation-delay: 0.35s; }
+.card:nth-child(8)  { animation-delay: 0.40s; }
+.card:nth-child(9)  { animation-delay: 0.45s; }
+.card:nth-child(10) { animation-delay: 0.50s; }
+.card:nth-child(n+11) { animation-delay: 0.55s; }
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* wishlist heart */
+.card .heart {
+    position: absolute; top: 10px; right: 12px;
+    font-size: 20px; cursor: pointer; z-index: 2;
+    transition: transform 0.2s;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+.card .heart:hover { transform: scale(1.3); }
+
+.card .img-wrap {
+    width: 100%; height: 210px;
+    overflow: hidden; background: #fff7f2;
+}
+.card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.card:hover img { transform: scale(1.07); }
+
+.card-body { padding: 12px 14px 0; }
+.card h3 {
+    font-size: 14px; font-weight: 700;
+    color: #2a1a0e; margin: 0 0 6px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.price {
+    color: #ff6a00; font-size: 16px;
+    font-weight: 900; margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+}
+
+/* ── Buttons ── */
+.btn-cart {
+    background: linear-gradient(135deg, #ff6a00, #ff8c38);
+    color: white; border: none;
+    padding: 9px 18px;
+    border-radius: 30px;
+    font-size: 13px; font-weight: 700;
+    font-family: 'Lato', sans-serif;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(255,106,0,0.35);
+    text-decoration: none; display: inline-block;
+}
+.btn-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,106,0,0.45);
+}
+.btn-cart:active { transform: scale(0.96); }
+
+/* ── Stats bar ── */
+.stats-bar {
+    position: relative; z-index: 1;
+    background: #ff6a00;
+    display: flex; justify-content: center; gap: 0;
+}
+.stat {
+    flex: 1; max-width: 200px;
+    text-align: center; padding: 20px 10px;
+    color: white; border-right: 1px solid rgba(255,255,255,0.2);
+}
+.stat:last-child { border-right: none; }
+.stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem; font-weight: 900; display: block;
+}
+.stat-label { font-size: 11px; opacity: 0.88; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── Footer ── */
+footer {
+    position: relative; z-index: 1;
+    background: #2a1a0e; color: white;
+    text-align: center; padding: 28px;
+    font-size: 14px; letter-spacing: 0.4px;
+}
+footer span { color: #ff6a00; }
+
+/* ── Toast ── */
+.toast {
+    position: fixed; bottom: 30px; right: 30px;
+    background: #2a1a0e; color: white;
+    padding: 14px 22px; border-radius: 14px;
+    font-size: 14px; font-weight: 700;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.4s cubic-bezier(.34,1.56,.64,1);
+    z-index: 9999; display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+@keyframes riseUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+}
+
+@media(max-width:600px) {
+    header { flex-direction: column; gap: 10px; padding: 12px 16px; }
+    nav a { margin: 0 7px; font-size: 12px; }
+    .products { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .stats-bar { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Header -->
+<header>
+    <div class="logo">📚 Book<span>Store</span></div>
+    <nav>
+        <a href="home.html">Home</a>
+ <a href="all books.html">Books</a>
+        <a href="about us.html">About</a>
+ <a href="cart.html">Cart</a>
+ <a href="login.html">Login</a>       
+        <a href="contact us.html">Contact</a>
+       
+        <a href="wishlist.html">Wishlist</a>
+        <a href="my orders.html">Orders</a>
+       
+    </nav>
+    <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Search books..." oninput="filterBooks()">
+    </div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">✨ Over 10,000+ Titles</div>
+        <h1>Find Your Next<br>Favourite Book</h1>
+        <p>Explore our curated collection of bestsellers & classics</p>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+    <div class="stat"><span class="stat-num">10K+</span><span class="stat-label">Books</span></div>
+    <div class="stat"><span class="stat-num">5K+</span><span class="stat-label">Readers</span></div>
+    <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Genres</span></div>
+    <div class="stat"><span class="stat-num">⭐ 4.9</span><span class="stat-label">Rating</span></div>
+</div>
+
+<!-- Category Pills -->
+<div class="cat-strip">
+    <div class="cat-pill active" onclick="setFilter(this,'all')">📚 All</div>
+    <div class="cat-pill" onclick="setFilter(this,'self')">🧠 Self Help</div>
+    <div class="cat-pill" onclick="setFilter(this,'fiction')">🌌 Fiction</div>
+    <div class="cat-pill" onclick="setFilter(this,'classic')">🏛️ Classics</div>
+    <div class="cat-pill" onclick="setFilter(this,'thriller')">🔥 Thriller</div>
+    <div class="cat-pill" onclick="setFilter(this,'children')">🧒 Children</div>
+</div>
+
+<!-- Section Heading -->
+<div class="section-head">
+    <h2>Our <span>Collection</span></h2>
+    <div class="divider"></div>
+</div>
+
+<!-- Products -->
+<div class="container">
+<div class="products" id="productsGrid">
+ <div class="card" data-cat="children">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQSu_n-CjtcwEpSPd7kPoP3Cz7K0AAwuqDv2U1bWo-VU3vi8Y3eqklfFzuKIF3zxLnJyZO_Uc5u3wLf_2xqvjcN5iaLcSZpWg" alt="book"></div>
+        <div class="card-body">
+            <h3>Story Book for Your Child</h3>
+            <p class="price">$134</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+<div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRniIdiInhorYRW4N6va8LqHdjkQqR5QehrxMPbRKqeLgodaBW1_HS0gYdN66gvLia755dJbz9bCS7pjowBkHGxOxSNihKVEy4jI8_iXLVM&s=10" alt="book"></div>
+        <div class="card-body">
+            <h3>The Stationery Shop</h3>
+            <p class="price">$178</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTH9B5qipQLSDlPHPWwMHzzmitgnlG9WTGvhCCk2vp2VLGJahU5Q9ZWZqiGztlFKIqBoPO7Lav5nOOwfdlEcAXQlfTxQsiK5QvCU--HrMI" alt="book"></div>
+        <div class="card-body">
+            <h3>The Psychology of Money</h3>
+            <p class="price">$399</p>
+            <a href="cart.html"><button class="btn-cart" onclick="addToCart('The Psychology of Money')">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcSU9vCCgDWqZ0mELwlCqLEKvC1l7T4kPfBGXMDz1vrj2MrNEzWoaPTewk6skViuIEH_AJNgnzfrC2oCE5wRjSfhfz2V9Djmh9BIVf2yEd2H" alt="book"></div>
+        <div class="card-body">
+            <h3>The Art Of Being Alone</h3>
+            <p class="price">$299</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRMvkGj9AU5ATEI88z4Z56yaLMvyJrvGRrwhYwewUi7rUyARr6NLAkW7P1NyG4qJwfm4pDk3EyN7ojFDA4Fx8kgM0GvEOtZIwaqYJbsZCg" alt="book"></div>
+        <div class="card-body">
+            <h3>Do It Today</h3>
+            <p class="price">$199</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+ <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQhHEfddjD3o5Od5Iqw1Dhis6VApQP4ZiIYWfoh9KXUmYKRu2aArTUS1nepSC6tSRkfNkAu7vQSUslVlVVyKGUUB2QCFiitm9CZOG872yftLCm6A2ptG6iT8A" alt="book"></div>
+        <div class="card-body">
+            <h3>Ignite Me – Audiobook</h3>
+            <p class="price">$329</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+
+    <div class="card" data-cat="classic">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSGz2kGVVkbZqkuCOgfwJt0-XaFmJ01xnlLx04VflKlOcblaQaf0LMQwif3sflq8zbj033uhN11kv9h6QH_9PKFT3w8pSgHnPFKLBdIdNG8t1nCawy5dvggSQ" alt="book"></div>
+        <div class="card-body">
+            <h3>The Metamorphosis</h3>
+            <p class="price">$178</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ6s38bi5CVEIiggf4nV03DWfRsRZKsUN0a6lkHRGAHvuTd0oFyi2EKvlsyXiAYoTkpjeUt0A23LRQXA5mUrlmV_uwracZyKJwQtCOCW8ovyB7S5ZZmLgDUtA" alt="book"></div>
+        <div class="card-body">
+            <h3>The Alchemist</h3>
+            <p class="price">$178</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTcFXQlPhAvdbjFtm3QlWHTgw8Uojlgm9AmCGCQKqnakC9CZ9s-ZquAN79PxROKAFEXyJBQLFE3hjcO3BGK540Zp9eE_rBdmE3sHdK7eCHg6gMcLypTFLMv" alt="book"></div>
+        <div class="card-body">
+            <h3>A Thousand Splendid Suns</h3>
+            <p class="price">$249</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="classic">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://images.meesho.com/images/products/297250836/aqaa3_512.webp?width=512" alt="book"></div>
+        <div class="card-body">
+            <h3>To Kill a Mockingbird</h3>
+            <p class="price">$249</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTcFXQlPhAvdbjFtm3QlWHTgw8Uojlgm9AmCGCQKqnakC9CZ9s-ZquAN79PxROKAFEXyJBQLFE3hjcO3BGK540Zp9eE_rBdmE3sHdK7eCHg6gMcLypTFLMv" alt="book"></div>
+        <div class="card-body">
+            <h3>Fourth Wing</h3>
+            <p class="price">$249</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRROGOjrbmLMiH4DgyAHk89qnH-fIwCISmwY4zJ-3nffyKPQRIK5DXaXV4OIJqpBu4awv7TS5NESY368Iih74oBvYJz_D_7QQ" alt="book"></div>
+        <div class="card-body">
+            <h3>You Can</h3>
+            <p class="price">$249</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTDl_oN0Sa6kodz5cw8vPWEg9U6yWAJjMe8-Dux6d0BF36lNRwG0evSPde2DiwLdTfizuZImuNu-L76sWEk--0S_vnoKXUox8QBq8_OEqzr" alt="book"></div>
+        <div class="card-body">
+            <h3>IKIGAI – The Japanese Secret</h3>
+            <p class="price">$299</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTxaDlLbvF-LUbMO3vyn8nDyLdw9IfDoOzefC8GG7CPuCU0xOIA0wgm8gUv9bQ1QNZD6ekazuJkNRxjn4NsuqLiNZMFSxd7" alt="book"></div>
+        <div class="card-body">
+            <h3>The Book Thief</h3>
+            <p class="price">$257</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSOL3dkEL7MqjDJNeSwSeHp4GcN4Ybc_jySEdczLyDge4GWdK429NaaI4FMzvXZXXkgTcmMLXe2g6j1PQNSyAlzcXJKT7ai" alt="book"></div>
+        <div class="card-body">
+            <h3>Cottage by the Sea</h3>
+            <p class="price">$501</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="thriller">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRXwQLOInikAhK1-IckuUrvOcEcxmpRcB2Dq2Q-jQ9IooAffQB4VsCzQTb8Ir0X2cJKBBJ76B6dpFF1Znu0UhehPmbRgvq9kA" alt="book"></div>
+        <div class="card-body">
+            <h3>Final Battle</h3>
+            <p class="price">$668</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="thriller">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ2y7wPUr2aIWRrE9g0ScIlMM7SV74ONACJHOsyoxyPIwfI_HKRmPzR4OgLuGoHUTg9lm8rSWtNO0orjF7tMOhx-Oh6xWag" alt="book"></div>
+        <div class="card-body">
+            <h3>Play Nice</h3>
+            <p class="price">$933</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRuMjbh2fRZm6cHFdhn_5v7IXKDbW7AXpJk5omp1o9L_AnD5sMr3rYwvnfkNEersD4kfOPGFYF6_DpTYuh9ezd6vhXwY64dLhaG13Hvy-SG" alt="book"></div>
+        <div class="card-body">
+            <h3>When I'm With You</h3>
+            <p class="price">$189</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+   
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSs6oG-CUKqqGXXASckDGsfVEVUGsZaHNLStrXNswqgBLyLqRKPWi0EZbWQmHl-hMMHpwn7DVck0mLAsRH0q8KxtWO8oz8H" alt="book"></div>
+        <div class="card-body">
+            <h3>Wings of Fire – Autobiography</h3>
+            <p class="price">$239</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSkekRxxgJOGFBfgqkYgV3lfLzzqT6Jo_E_ameOS-XEjNte7NZZOKBIeCmP03i8gkX6q1OGBk8RFBHWhONzdEKwG1bYOswo5iTBod1hXgZeepuaET_QrQYoTA" alt="book"></div>
+        <div class="card-body">
+            <h3>The Art Of Not Overthinking</h3>
+            <p class="price">$789</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://champaca.in/cdn/shop/files/81K8NtA8FmL._SL1500_grande.jpg?v=1747122764" alt="book"></div>
+        <div class="card-body">
+            <h3>The Book Of Doors</h3>
+            <p class="price">$599</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQMF9TNFBedmOnHVffrGizag7nZK4TuHy-pnr49IHHPupTXfFs0aPWzmNQnknZXllm2RlyJVMfFcaJc-4M6BSox8DJminpCf86PYIBEXhUcKnsB9YxUhv_41A" alt="book"></div>
+        <div class="card-body">
+            <h3>A Game Of Thrones</h3>
+            <p class="price">$430</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="thriller">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTPa87nGI8Kuv8bYAx6aEUp6a0-pGITvag7mczjrpuRD0NTBs-kUlOHrYDfKzhXdLj-nrAF4S2fLIicT1DB1PNwXvpMtS9ZC15Lvja5Sn6a6m5TdenBi0p-tpM" alt="book"></div>
+        <div class="card-body">
+            <h3>Angels And Demons</h3>
+            <p class="price">$416</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="self">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQZKPRwMJVTM95spDKQHOX-0L8PWb5OckO806k6rx5BZWmCrgvuvVkMw3GwFxnGbEUrMSllQUeeSUlUnEkxBOhnZtCOqxUwYQ" alt="book"></div>
+        <div class="card-body">
+            <h3>The Secret</h3>
+            <p class="price">$906</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="thriller">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSurx7UC72pgG564MUUlYCksRu7xpKXN6fmwhtTkL5XIL5eaHfIx0lwvw8qGFlDx25aaCxRS8XfCqoCrVjyxXEVCNbnEl9kAQ" alt="book"></div>
+        <div class="card-body">
+            <h3>Five Nights at Freddy's</h3>
+            <p class="price">$678</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRArMsDwS8FDFHnKTO-7YfSxDD4bKqAdidRrqpTMnrTkfxG0ejvxDhKyvOTY_voetu-eOXv-Mit7ifUEerGNaYbWh6YdpjW3Oq50XwpLk7gbRuT2zP3CjQ3-w" alt="book"></div>
+        <div class="card-body">
+            <h3>The Hunger Games</h3>
+            <p class="price">$300</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+   
+    <div class="card" data-cat="fiction">
+        <span class="heart" onclick="wishToggle(this)">🤍</span>
+        <div class="img-wrap"><img src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTCMbNzM-p_b1uybmHYKBcPZjABdk8IL1YpJyvbQf5X1fXKEBejOEUv_PAi2ClCP7NXS45vDHG6YKOBVt7Q2ch4guvGHDA1rPAmcIthrKoz" alt="book"></div>
+        <div class="card-body">
+            <h3>Caraval by Stephanie Garber</h3>
+            <p class="price">$199</p>
+            <a href="cart.html"><button class="btn-cart">🛒 Add to Cart</button></a>
+        </div>
+    </div>
+
+</div><!-- /products -->
+</div><!-- /container -->
+
+<!-- Footer -->
+<footer>
+    <p>📚 <span>BookStore</span> &copy; 2025 — Made with ❤️ for book lovers everywhere</p>
+</footer>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Particles ── */
+const emojis = ['📚','📖','📝','✏️','🔖','📕','📗','📘','⭐'];
+const pc = document.getElementById('particles');
+for (let i = 0; i < 22; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.textContent = emojis[i % emojis.length];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (13 + Math.random() * 16) + 'px';
+    el.style.animationDuration = (12 + Math.random() * 18) + 's';
+    el.style.animationDelay = (Math.random() * 22) + 's';
+    pc.appendChild(el);
+}
+
+/* ── Toast ── */
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerHTML = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ── Wishlist toggle ── */
+function wishToggle(el) {
+    if (el.textContent === '🤍') {
+        el.textContent = '❤️';
+        showToast('❤️ Added to Wishlist!');
+    } else {
+        el.textContent = '🤍';
+        showToast('💔 Removed from Wishlist');
+    }
+}
+
+/* ── Add to cart toast ── */
+function addToCart(name) {
+    showToast('🛒 Added to Cart!');
+}
+document.querySelectorAll('.btn-cart').forEach(btn => {
+    btn.addEventListener('click', () => showToast('🛒 Added to Cart!'));
+});
+
+/* ── Category filter ── */
+let currentFilter = 'all';
+function setFilter(el, cat) {
+    currentFilter = cat;
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    filterBooks();
+}
+
+/* ── Search + filter ── */
+function filterBooks() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('.card').forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const cat   = card.dataset.cat;
+        const matchCat  = currentFilter === 'all' || cat === currentFilter;
+        const matchText = title.includes(q);
+        card.style.display = (matchCat && matchText) ? '' : 'none';
+    });
+}
+</script>
+</body>
+</html>

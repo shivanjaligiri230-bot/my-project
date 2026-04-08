@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register – Book Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #efd8c9;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Particles ── */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            opacity: 0.12;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
+            10%  { opacity: 0.12; }
+            90%  { opacity: 0.12; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: #ff6a00;
+            padding: 14px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(255,106,0,0.4);
+        }
+        .navbar a {
+            color: white;
+            margin: 0 11px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            position: relative;
+            transition: color 0.25s;
+        }
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: yellow;
+            transition: width 0.3s ease;
+        }
+        .navbar a:hover { color: yellow; }
+        .navbar a:hover::after { width: 100%; }
+
+        /* ── Page layout ── */
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 52px);
+            padding: 40px 16px;
+        }
+
+        /* ── Card ── */
+        .form-box {
+            width: min(420px, 100%);
+            background: white;
+            border-radius: 24px;
+            padding: 44px 40px 38px;
+            box-shadow: 0 24px 64px rgba(180,100,40,0.2), 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+            animation: riseUp 0.8s ease both;
+            position: relative;
+            overflow: hidden;
+        }
+        /* top glow bar */
+        .form-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ff6a00, transparent);
+            border-radius: 0 0 4px 4px;
+        }
+        @keyframes riseUp {
+            from { opacity: 0; transform: translateY(50px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0)    scale(1); }
+        }
+
+        .form-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 4px;
+            animation: bounce 2.8s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-9px); }
+        }
+
+        .form-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            color: #2a1a0e;
+            margin-bottom: 6px;
+        }
+        .form-subtitle {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 28px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Inputs ── */
+        .input-wrap {
+            position: relative;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .input-wrap .icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            pointer-events: none;
+        }
+        .input-wrap input[type="text"],
+        .input-wrap input[type="email"],
+        .input-wrap input[type="password"] {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1.8px solid #e8d5c8;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Lato', sans-serif;
+            background: #fff7f2;
+            color: #333;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+            outline: none;
+        }
+        .input-wrap input:focus {
+            border-color: #ff6a00;
+            box-shadow: 0 0 0 3px rgba(255,106,0,0.12);
+            transform: scale(1.01);
+            background: #fff;
+        }
+
+        /* ── Gender row ── */
+        .gender-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .gender-opt {
+            flex: 1;
+            border: 1.8px solid #e8d5c8;
+            border-radius: 12px;
+            padding: 10px;
+            cursor: pointer;
+            background: #fff7f2;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #555;
+            font-family: 'Lato', sans-serif;
+        }
+        .gender-opt input[type="radio"] { display: none; }
+        .gender-opt:has(input:checked),
+        .gender-opt.selected {
+            border-color: #ff6a00;
+            background: #fff1e8;
+            color: #ff6a00;
+            font-weight: 700;
+            box-shadow: 0 0 0 3px rgba(255,106,0,0.1);
+        }
+        .gender-opt:hover { border-color: #ff6a00; }
+
+        /* ── Terms ── */
+        .terms-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .terms-row input[type="checkbox"] {
+            width: 18px; height: 18px;
+            accent-color: #ff6a00;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .terms-row label { font-size: 13px; color: #666; cursor: pointer; }
+        .terms-row a { color: #ff6a00; text-decoration: none; font-weight: 700; }
+        .terms-row a:hover { text-decoration: underline; }
+
+        /* ── Submit button ── */
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6a00, #ff8c38);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Lato', sans-serif;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(255,106,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-register::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.25);
+            border-radius: 50%;
+            transform: translate(-50%,-50%);
+            transition: width 0.5s, height 0.5s, opacity 0.5s;
+            opacity: 0;
+        }
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(255,106,0,0.45);
+        }
+        .btn-register:active::after {
+            width: 300px; height: 300px; opacity: 0;
+        }
+
+        .login-link {
+            margin-top: 18px;
+            font-size: 13px;
+            color: #888;
+        }
+        .login-link a {
+            color: #ff6a00;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .login-link a:hover { text-decoration: underline; }
+
+        /* ── Success overlay ── */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .success-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+            animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.6); opacity: 0; }
+            to   { transform: scale(1);   opacity: 1; }
+        }
+        .success-card .tick { font-size: 64px; display: block; margin-bottom: 14px; }
+        .success-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            color: #2a1a0e;
+            margin-bottom: 8px;
+        }
+        .success-card p { color: #888; font-size: 15px; margin-bottom: 24px; }
+        .success-card button {
+            background: linear-gradient(135deg, #ff6a00, #ff8c38);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Lato', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255,106,0,0.4);
+        }
+
+        @media(max-width: 480px) {
+            .form-box { padding: 36px 22px 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Navbar -->
+<div class="navbar">
+    <a href="home.html">Home</a>
+    <a href="all books.html">Books</a>
+  <a href="about us.html">About</a>
+    <a href="cart.html">Cart</a>
+<a href="Login.html">Login</a>
+<a href="contact us.html">Contact</a>
+<a href="wishlist.html">Wishlist</a>
+    <a href="my orders.html">Orders</a>
+    
+  
+    
+    
+</div>
+
+<!-- Page wrap -->
+<div class="page-wrap">
+    <div class="form-box">
+        <span class="form-icon">📚</span>
+        <h2>Create Account</h2>
+        <p class="form-subtitle">Join thousands of happy readers today</p>
+
+        <form onsubmit="return validateForm()">
+            <div class="input-wrap">
+                <span class="icon">👤</span>
+                <input type="text" placeholder="Full Name" required>
+            </div>
+            <div class="input-wrap">
+                <span class="icon">✉️</span>
+                <input type="email" placeholder="Email Address" required>
+            </div>
+            <div class="input-wrap">
+                <span class="icon">🔒</span>
+                <input type="password" id="pass" placeholder="Password" required>
+            </div>
+            <div class="input-wrap">
+                <span class="icon">🔐</span>
+                <input type="password" id="cpass" placeholder="Confirm Password" required>
+            </div>
+
+            <!-- Gender -->
+            <div class="gender-row">
+                <label class="gender-opt" id="maleOpt">
+                    <input type="radio" name="gender" value="male" onchange="selectGender(this)"> 👨 Male
+                </label>
+                <label class="gender-opt" id="femaleOpt">
+                    <input type="radio" name="gender" value="female" onchange="selectGender(this)"> 👩 Female
+                </label>
+            </div>
+
+            <!-- Terms -->
+            <div class="terms-row">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+            </div>
+
+            <button type="submit" class="btn-register">🚀 Create My Account</button>
+        </form>
+
+        <p class="login-link">Already have an account? <a href="Login.html">Sign In</a></p>
+    </div>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+        <span class="tick">🎉</span>
+        <h3>Welcome Aboard!</h3>
+        <p>Your account has been created successfully.<br>Happy reading! 📖</p>
+        <button onclick="document.getElementById('successOverlay').classList.remove('show')">Continue →</button>
+    </div>
+</div>
+
+<script>
+    /* ── Particles ── */
+    const emojis = ['📚','📖','📝','✏️','🔖','📕','📗','📘','⭐'];
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        el.textContent = emojis[i % emojis.length];
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.fontSize = (14 + Math.random() * 16) + 'px';
+        el.style.animationDuration = (12 + Math.random() * 16) + 's';
+        el.style.animationDelay = (Math.random() * 20) + 's';
+        container.appendChild(el);
+    }
+
+    /* ── Gender highlight ── */
+    function selectGender(radio) {
+        document.getElementById('maleOpt').classList.remove('selected');
+        document.getElementById('femaleOpt').classList.remove('selected');
+        radio.closest('.gender-opt').classList.add('selected');
+    }
+
+    /* ── Form validation ── */
+    function validateForm() {
+        const p  = document.getElementById("pass").value;
+        const cp = document.getElementById("cpass").value;
+        if (p !== cp) {
+            shakeCpass();
+            return false;
+        }
+        document.getElementById('successOverlay').classList.add('show');
+        return false; // prevent actual submit for demo
+    }
+
+    function shakeCpass() {
+        const el = document.getElementById('cpass');
+        el.style.borderColor = 'red';
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = 'shake 0.4s ease';
+        setTimeout(() => { el.style.borderColor = ''; el.style.animation = ''; }, 600);
+    }
+</script>
+
+<style>
+    @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20%      { transform: translateX(-8px); }
+        40%      { transform: translateX(8px); }
+        60%      { transform: translateX(-6px); }
+        80%      { transform: translateX(6px); }
+    }
+</style>
+</body>
+</html>
